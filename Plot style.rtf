@@ -1,0 +1,93 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2706
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww18280\viewh15340\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 scale_size(range = c(0.1,1.5),name = "Percent expressed cells")+\
+scale_size_manual(values = seq(1,6,0.5))+\
+\
+a = max(abs(df1$avg_log2FC))+0.2 \
+\
+scale_fill_gradientn(colours = Col.HiLow.9Shades,\
+			      values = scales::rescale(   c(  min(df1$avg_log2FC),-0.1,0,0.1,  max(df1$avg_log2FC)  ) )  )\
+scale_fill_gradientn(colours = Col.HiLow.9Shades,\
+			       values = scales::rescale(   c( -a,-0.1,0,0.1,  a ) ),\
+                                 limits = c(-a,a) ) +\
+\
+scale_color_gradientn(colours = Col.HiLow.9Shades, \
+                                  values = c(0,0.4,0.5,0.6,1 ),\
+                                  limits = c(-a ,a ))+ \
+\
+\
+\
+\
+                  theme(plot.title = element_blank(),\
+                        axis.title = element_blank(),\
+                        axis.text.x = element_text(size =5, family = "Arial", color = "black", face = "italic",angle = 90, hjust =1, vjust =0.3),\
+                        axis.text.y = element_text(size =5, family = "Arial", color = "black"),\
+                        axis.line = element_line(colour = 'black', size = 0.25),\
+                        axis.ticks = element_line(colour = 'black', size = 0.15),\
+                        axis.ticks.length = unit(0.05,"cm"),\
+                        strip.background = element_rect(fill = "white\'94,linewidth = 0.35),\
+		       strip.placement = "outside",\
+                        strip.text.x.top = element_text(size =5, family = "Arial",colour = "black"),\
+                        strip.text = element_text(size =5, family = "Arial",colour = "black",\
+                                      margin = margin(t = 0.1, r = 0, b = 0.1, l = 0, unit = "cm") ),\
+                        legend.key.size = unit(0.1, 'in'),\
+                        legend.title = element_text(size = 5),\
+                        legend.text = element_text(size=4),\
+		       plot.margin = margin(t = 0, r = 0, b = 0, l = 0  )\
+                        legend.position = "right\'94)\
+\
+geom_tile(color = "white",aes(fill =avg_log2FC)) +  \
+    scale_fill_gradientn(colours = Col.HiLow.9Shades, values = scales::rescale(c(min(df1$avg_log2FC),-0.1,0,0.1,max(df1$avg_log2FC)) ))\
+geom_point(aes(color = avg_log2FC, size = p_val_cat))+\
+   scale_size_manual(values = c(0.5,1,2,3)) + \
+   scale_color_gradientn(values = rescale(   c( -a,-0.1,0,0.1,  a ) ) ,\
+                         colours = Col.HiLow.9Shades,\
+                         limits = c(-a,a) ) \
+\
+\
+for(i in c("CD8.Overview2") )\{\
+  selected.genes = unlist( GeneSet$DE[[i]] ) %>% unique()\
+  df1 = filter(df, Genes %in% selected.genes )  %>% filter(Cluster %in% selected.cluster)\
+  df1 = pCat(df1,"p_val_adj")\
+  df1 = GeneGroup(df1, GeneSet$DE[[i]] )\
+  Fsize = 6\
+  a = max(abs(df1$avg_log2FC))+0.2 \
+  plot = ggplot(df1, aes(y = Dataset , x = Genes  ) ) + \
+    facet_grid(Cluster ~ Set, scales = "free", space="free", switch = "y") + \
+    theme_classic() + \
+    geom_tile(color = "white",aes(fill =avg_log2FC)) +  \
+    scale_fill_gradientn(colours = Col.HiLow.7Shades,\
+                         name = "Average log2 fold change\\n(PTGER4hi/lo)",\
+                         values =  c( 0,0.1,0.45,0.48,0.5,0.52,0.55,0.9,  1 ),   \
+                         breaks = c(-1,-0.5,0,0.5,1),\
+                         limits = c(-a,a) ) +\
+    theme(plot.title = element_blank(),\
+          axis.text.x = element_text(size =Fsize, family = "Arial", color = "black", face = "italic",angle = 90, hjust =1, vjust =0.3),\
+          axis.text.y = element_text(size =Fsize, family = "Arial", color = "black"),\
+          axis.line = element_line(colour = 'black', linewidth = 0.25),\
+          axis.ticks = element_line(colour = 'black', linewidth = 0.15),\
+          axis.ticks.length = unit(0.05,"cm"),\
+          axis.title = element_blank(), \
+          strip.text.y = element_blank(),\
+          strip.text.x.top = element_text(size =Fsize, family = "Arial",colour = "black",\
+                                          margin = margin(t = 0.02, r = 0, b = 0.02, l = 0, unit = "cm") ),\
+          strip.background = element_rect(fill = "white",linewidth = 0.35),\
+          strip.background.y =  element_blank(),\
+          strip.placement = "outside",\
+          legend.key.size = unit(0.1, 'in'),\
+          legend.title = element_text(size = Fsize,family = "Arial", color = "black",angle=90),\
+          legend.text = element_text(size=Fsize-1,family = "Arial", color = "black"),\
+          plot.margin = margin(t = 0, r = 0, b = 0, l = 0  ),\
+          legend.position = "right"\
+          )\
+                \
+  PDF(paste0("Ext.Fig.3B.BOC.CD4.DE.perSpec.Heatmap.Celltype.",i), h = 2.1, w = 5.6 )\
+  #PDF(paste0("Ext.Fig.5C.LLC.Heatmap.Celltype2.padj.V2.",t,".",i), h = 1.8, w = (0.35+ (length(unique(df1$Genes))*0.08) ) )\
+  print(plot)\
+  dev.off()\
+\}}
